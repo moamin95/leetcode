@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Search, RefreshCw, Play, X, ChevronDown, ChevronRight } from 'lucide-react';
-import './ParrotScenarioSwitcher.css';
 
 export interface Scenario {
   id?: string;
@@ -53,12 +52,78 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
   const [error, setError] = useState('');
   const [expandedGroups, setExpandedGroups] = useState(new Set<string>());
 
-  // Position classes
-  const positionClasses = {
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4'
+  // Position styles
+  const positionStyles = {
+    'top-right': { top: '1rem', right: '1rem' },
+    'top-left': { top: '1rem', left: '1rem' },
+    'bottom-right': { bottom: '1rem', right: '1rem' },
+    'bottom-left': { bottom: '1rem', left: '1rem' }
+  };
+
+  // Base styles
+  const containerStyle: React.CSSProperties = {
+    position: 'fixed',
+    zIndex: 9999,
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale',
+    ...positionStyles[position]
+  };
+
+  const toggleButtonStyle: React.CSSProperties = {
+    backgroundColor: '#2563eb',
+    color: 'white',
+    padding: '0.5rem 1rem',
+    border: 'none',
+    borderRadius: '0.5rem',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
+    fontSize: '0.875rem'
+  };
+
+  const panelStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: '3rem',
+    right: '0',
+    width: '24rem',
+    backgroundColor: 'white',
+    border: '1px solid #e5e7eb',
+    borderRadius: '0.5rem',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    overflow: 'hidden'
+  };
+
+  const headerStyle: React.CSSProperties = {
+    backgroundColor: '#f9fafb',
+    padding: '0.75rem 1rem',
+    borderBottom: '1px solid #e5e7eb'
+  };
+
+  const searchContainerStyle: React.CSSProperties = {
+    padding: '1rem',
+    borderBottom: '1px solid #e5e7eb'
+  };
+
+  const searchInputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.5rem 0.75rem 0.5rem 2.5rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    outline: 'none'
+  };
+
+  const iconButtonStyle: React.CSSProperties = {
+    padding: '0.25rem',
+    color: '#9ca3af',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'color 0.2s'
   };
 
   // Fetch scenarios
@@ -190,23 +255,77 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     const scenarioName = getScenarioName(scenario);
     const isCurrentScenario = scenarioName === currentScenario;
     
+    const itemStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0.75rem 1rem',
+      cursor: 'pointer',
+      transition: 'background-color 0.2s',
+      borderBottom: '1px solid #f3f4f6',
+      backgroundColor: isCurrentScenario ? '#dbeafe' : 'transparent'
+    };
+
+    const nameStyle: React.CSSProperties = {
+      fontWeight: 500,
+      color: '#111827',
+      fontSize: '0.875rem',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      flex: 1,
+      minWidth: 0
+    };
+
+    const descriptionStyle: React.CSSProperties = {
+      fontSize: '0.75rem',
+      color: '#6b7280',
+      marginTop: '0.25rem',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    };
+
+    const actionsStyle: React.CSSProperties = {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem'
+    };
+
+    const indicatorStyle: React.CSSProperties = {
+      width: '0.5rem',
+      height: '0.5rem',
+      backgroundColor: '#10b981',
+      borderRadius: '50%'
+    };
+
     return (
       <div
         key={index}
-        className={`pss-scenario-item ${isCurrentScenario ? 'pss-scenario-item--active' : ''}`}
+        style={itemStyle}
         onClick={() => applyScenario(scenario)}
+        onMouseEnter={(e) => {
+          if (!isCurrentScenario) {
+            e.currentTarget.style.backgroundColor = '#eff6ff';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isCurrentScenario) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }
+        }}
       >
-        <div className="pss-scenario-content">
-          <div className="pss-scenario-name">{scenarioName}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={nameStyle}>{scenarioName}</div>
           {typeof scenario === 'object' && scenario.description && (
-            <div className="pss-scenario-description">{scenario.description}</div>
+            <div style={descriptionStyle}>{scenario.description}</div>
           )}
         </div>
-        <div className="pss-scenario-actions">
+        <div style={actionsStyle}>
           {isCurrentScenario && showCurrentScenario && (
-            <div className="pss-current-indicator"></div>
+            <div style={indicatorStyle}></div>
           )}
-          <Play className="pss-icon pss-play-icon" />
+          <Play style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} />
         </div>
       </div>
     );
@@ -215,91 +334,283 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
   const renderGroupedScenarios = () => {
     const groups = groupScenariosFunction(filteredScenarios);
     
-    return Object.entries(groups).map(([groupName, groupScenarios]) => (
-      <div key={groupName} className="pss-group">
-        <div
-          className="pss-group-header"
-          onClick={() => toggleGroup(groupName)}
-        >
-          <span className="pss-group-name">{groupName}</span>
-          <div className="pss-group-info">
-            <span className="pss-group-count">({groupScenarios.length})</span>
-            {expandedGroups.has(groupName) ? 
-              <ChevronDown className="pss-icon pss-chevron-icon" /> : 
-              <ChevronRight className="pss-icon pss-chevron-icon" />
-            }
+    return Object.entries(groups).map(([groupName, groupScenarios]) => {
+      const isExpanded = expandedGroups.has(groupName);
+      
+      const groupHeaderStyle: React.CSSProperties = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0.75rem 1rem',
+        backgroundColor: '#f9fafb',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s',
+        borderBottom: '1px solid #e5e7eb'
+      };
+
+      const groupInfoStyle: React.CSSProperties = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
+      };
+
+      return (
+        <div key={groupName}>
+          <div
+            style={groupHeaderStyle}
+            onClick={() => toggleGroup(groupName)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f3f4f6';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#f9fafb';
+            }}
+          >
+            <span style={{ fontWeight: 500, color: '#374151', fontSize: '0.875rem' }}>
+              {groupName}
+            </span>
+            <div style={groupInfoStyle}>
+              <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                ({groupScenarios.length})
+              </span>
+              {isExpanded ? 
+                <ChevronDown style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} /> : 
+                <ChevronRight style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} />
+              }
+            </div>
           </div>
+          {isExpanded && (
+            <div style={{ backgroundColor: 'white' }}>
+              {groupScenarios.map((scenario, index) => renderScenarioItem(scenario, index))}
+            </div>
+          )}
         </div>
-        {expandedGroups.has(groupName) && (
-          <div className="pss-group-content">
-            {groupScenarios.map((scenario, index) => renderScenarioItem(scenario, index))}
-          </div>
-        )}
-      </div>
-    ));
+      );
+    });
   };
 
   return (
-    <div className={`pss-container ${positionClasses[position]} ${className}`}>
+    <div style={{ ...containerStyle }} className={className}>
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="pss-toggle-button"
+        style={toggleButtonStyle}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#1d4ed8';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#2563eb';
+        }}
       >
-        <Play className="pss-icon" />
+        <Play style={{ width: '1rem', height: '1rem' }} />
         <span>Scenarios</span>
         {currentScenario !== 'default' && showCurrentScenario && (
-          <div className="pss-active-indicator"></div>
+          <div style={{
+            width: '0.5rem',
+            height: '0.5rem',
+            backgroundColor: '#34d399',
+            borderRadius: '50%'
+          }}></div>
         )}
       </button>
 
       {/* Scenario Panel */}
       {isOpen && (
-        <div className="pss-panel">
+        <div style={panelStyle}>
           {/* Header */}
-          <div className="pss-header">
-            <div className="pss-header-content">
-              <h3 className="pss-title">Parrot Scenarios</h3>
-              <div className="pss-header-actions">
+          <div style={headerStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h3 style={{ fontWeight: 500, color: '#111827', margin: 0, fontSize: '1rem' }}>
+                Parrot Scenarios
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
                   onClick={fetchScenarios}
                   disabled={loading}
-                  className="pss-icon-button"
+                  style={{
+                    ...iconButtonStyle,
+                    opacity: loading ? 0.5 : 1,
+                    cursor: loading ? 'not-allowed' : 'pointer'
+                  }}
                 >
-                  <RefreshCw className={`pss-icon ${loading ? 'pss-spinning' : ''}`} />
+                  <RefreshCw style={{
+                    width: '1rem',
+                    height: '1rem',
+                    animation: loading ? 'spin 1s linear infinite' : 'none'
+                  }} />
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="pss-icon-button"
+                  style={iconButtonStyle}
                 >
-                  <X className="pss-icon" />
+                  <X style={{ width: '1rem', height: '1rem' }} />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Search Bar */}
-          <div className="pss-search-container">
-            <div className="pss-search-wrapper">
-              <Search className="pss-icon pss-search-icon" />
+          <div style={searchContainerStyle}>
+            <div style={{ position: 'relative' }}>
+              <Search style={{
+                position: 'absolute',
+                left: '0.75rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#9ca3af',
+                width: '1rem',
+                height: '1rem'
+              }} />
               <input
                 type="text"
                 placeholder="Search scenarios..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pss-search-input"
+                style={searchInputStyle}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563eb';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(37, 99, 235, 0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="pss-error">
-              <div className="pss-error-text">{error}</div>
+            <div style={{
+              padding: '1rem',
+              backgroundColor: '#fef2f2',
+              borderBottom: '1px solid #fecaca'
+            }}>
+              <div style={{ fontSize: '0.875rem', color: '#b91c1c' }}>{error}</div>
             </div>
           )}
 
           {/* Scenarios List */}
+          <div style={{ maxHeight, overflowY: 'auto' }}>
+            {loading ? (
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <RefreshCw style={{
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  margin: '0 auto 0.5rem',
+                  color: '#9ca3af',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Loading scenarios...</div>
+              </div>
+            ) : filteredScenarios.length === 0 ? (
+              <div style={{
+                padding: '2rem',
+                textAlign: 'center',
+                color: '#6b7280',
+                fontSize: '0.875rem'
+              }}>
+                {searchTerm ? 'No scenarios match your search' : 'No scenarios available'}
+              </div>
+            ) : (
+              renderGroupedScenarios()
+            )}
+          </div>
+
+          {/* Footer */}
+          <div style={{
+            backgroundColor: '#f9fafb',
+            padding: '0.75rem 1rem',
+            borderTop: '1px solid #e5e7eb'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.75rem',
+              color: '#6b7280'
+            }}>
+              <span>Total: {filteredScenarios.length} scenarios</span>
+              {showCurrentScenario && <span>Current: {currentScenario}</span>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add spinning animation */}
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+export default ParrotScenarioSwitcher; List */}
+          <div style={{ maxHeight, overflowY: 'auto' }}>
+            {loading ? (
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <RefreshCw style={{
+                  width: '1.5rem',
+                  height: '1.5rem',
+                  margin: '0 auto 0.5rem',
+                  color: '#9ca3af',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Loading scenarios...</div>
+              </div>
+            ) : filteredScenarios.length === 0 ? (
+              <div style={{
+                padding: '2rem',
+                textAlign: 'center',
+                color: '#6b7280',
+                fontSize: '0.875rem'
+              }}>
+                {searchTerm ? 'No scenarios match your search' : 'No scenarios available'}
+              </div>
+            ) : (
+              renderGroupedScenarios()
+            )}
+          </div>
+
+          {/* Footer */}
+          <div style={{
+            backgroundColor: '#f9fafb',
+            padding: '0.75rem 1rem',
+            borderTop: '1px solid #e5e7eb'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.75rem',
+              color: '#6b7280'
+            }}>
+              <span>Total: {filteredScenarios.length} scenarios</span>
+              {showCurrentScenario && <span>Current: {currentScenario}</span>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add spinning animation */}
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+export default ParrotScenarioSwitcher; List */}
           <div className="pss-scenarios-list" style={{ maxHeight }}>
             {loading ? (
               <div className="pss-loading">
