@@ -126,7 +126,13 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     transition: 'color 0.2s'
   };
 
-  // Fetch scenarios
+  // Get scenario name helper function
+  const getScenarioName = (scenario: Scenario | string): string => {
+    if (typeof scenario === 'string') return scenario;
+    return scenario.name || scenario.id || JSON.stringify(scenario);
+  };
+
+  // Fetch scenarios function
   const fetchScenarios = async () => {
     try {
       setLoading(true);
@@ -156,31 +162,7 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     }
   };
 
-  // Load scenarios when component mounts
-  useEffect(() => {
-    fetchScenarios();
-  }, []);
-
-  // Filter scenarios based on search term
-  useEffect(() => {
-    if (!searchTerm) {
-      setFilteredScenarios(scenarios);
-      return;
-    }
-
-    const filtered = scenarios.filter(scenario => 
-      getScenarioName(scenario).toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredScenarios(filtered);
-  }, [searchTerm, scenarios]);
-
-  // Get scenario name
-  const getScenarioName = (scenario: Scenario | string): string => {
-    if (typeof scenario === 'string') return scenario;
-    return scenario.name || scenario.id || JSON.stringify(scenario);
-  };
-
-  // Apply scenario
+  // Apply scenario function
   const applyScenario = async (scenario: Scenario | string) => {
     try {
       setLoading(true);
@@ -219,7 +201,7 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     }
   };
 
-  // Group scenarios
+  // Group scenarios function
   const groupScenariosFunction = (scenarios: (Scenario | string)[]) => {
     if (!groupScenarios) {
       return { 'All Scenarios': scenarios };
@@ -251,6 +233,7 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     setExpandedGroups(newExpanded);
   };
 
+  // Render scenario item function
   const renderScenarioItem = (scenario: Scenario | string, index: number) => {
     const scenarioName = getScenarioName(scenario);
     const isCurrentScenario = scenarioName === currentScenario;
@@ -331,6 +314,7 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     );
   };
 
+  // Render grouped scenarios function
   const renderGroupedScenarios = () => {
     const groups = groupScenariosFunction(filteredScenarios);
     
@@ -389,6 +373,24 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
     });
   };
 
+  // Effects
+  useEffect(() => {
+    fetchScenarios();
+  }, []);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredScenarios(scenarios);
+      return;
+    }
+
+    const filtered = scenarios.filter(scenario => 
+      getScenarioName(scenario).toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredScenarios(filtered);
+  }, [searchTerm, scenarios]);
+
+  // Render component
   return (
     <div style={{ ...containerStyle }} className={className}>
       {/* Toggle Button */}
@@ -546,95 +548,6 @@ const ParrotScenarioSwitcher: React.FC<ParrotScenarioSwitcherProps> = ({
           }
         `}
       </style>
-    </div>
-  );
-};
-
-export default ParrotScenarioSwitcher; List */}
-          <div style={{ maxHeight, overflowY: 'auto' }}>
-            {loading ? (
-              <div style={{ padding: '2rem', textAlign: 'center' }}>
-                <RefreshCw style={{
-                  width: '1.5rem',
-                  height: '1.5rem',
-                  margin: '0 auto 0.5rem',
-                  color: '#9ca3af',
-                  animation: 'spin 1s linear infinite'
-                }} />
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Loading scenarios...</div>
-              </div>
-            ) : filteredScenarios.length === 0 ? (
-              <div style={{
-                padding: '2rem',
-                textAlign: 'center',
-                color: '#6b7280',
-                fontSize: '0.875rem'
-              }}>
-                {searchTerm ? 'No scenarios match your search' : 'No scenarios available'}
-              </div>
-            ) : (
-              renderGroupedScenarios()
-            )}
-          </div>
-
-          {/* Footer */}
-          <div style={{
-            backgroundColor: '#f9fafb',
-            padding: '0.75rem 1rem',
-            borderTop: '1px solid #e5e7eb'
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '0.75rem',
-              color: '#6b7280'
-            }}>
-              <span>Total: {filteredScenarios.length} scenarios</span>
-              {showCurrentScenario && <span>Current: {currentScenario}</span>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add spinning animation */}
-      <style>
-        {`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}
-      </style>
-    </div>
-  );
-};
-
-export default ParrotScenarioSwitcher; List */}
-          <div className="pss-scenarios-list" style={{ maxHeight }}>
-            {loading ? (
-              <div className="pss-loading">
-                <RefreshCw className="pss-icon pss-spinning pss-loading-icon" />
-                <div className="pss-loading-text">Loading scenarios...</div>
-              </div>
-            ) : filteredScenarios.length === 0 ? (
-              <div className="pss-empty">
-                {searchTerm ? 'No scenarios match your search' : 'No scenarios available'}
-              </div>
-            ) : (
-              renderGroupedScenarios()
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="pss-footer">
-            <div className="pss-footer-content">
-              <span>Total: {filteredScenarios.length} scenarios</span>
-              {showCurrentScenario && <span>Current: {currentScenario}</span>}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
